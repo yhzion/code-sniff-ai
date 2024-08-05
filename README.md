@@ -1,4 +1,4 @@
-![Uploading image.png…]()
+<img width="1012" alt="image" src="https://github.com/user-attachments/assets/32f02c44-1fb3-416d-9327-40fdb42aaa89">
 
 # code-sniff-ai
 
