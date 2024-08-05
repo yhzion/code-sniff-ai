@@ -22,6 +22,13 @@ code-sniff-ai
 
 ## 설치 및 설정
 
+### 0. 지원되는 서비스
+
+- ollama
+- OpenAI chatgpt
+- Anthropic Claude
+- Google Gemini
+
 ### 1. .env 파일 설정
 
 `.env.sample` 파일을 참고하여 `.env` 파일을 생성하고, 필요한 환경 변수들을 설정합니다.
@@ -149,8 +156,10 @@ ollama pull gemma2
 - [Ollama 설치 안내 페이지](https://ollama.com/download)
 
 ## 기원 (origin)
+
 - [권도언님의 velog](https://velog.io/@kwonhl0211/) 에 포스팅되어있는 [Claude로 코드리뷰 경험 개선하기](https://velog.io/@kwonhl0211/Claude%EB%A1%9C-%EC%BD%94%EB%93%9C%EB%A6%AC%EB%B7%B0-%EA%B2%BD%ED%97%98-%EA%B0%9C%EC%84%A0%ED%95%98%EA%B8%B0) 내용의 fork 버전 입니다.
 - 권도언님, 유레카 포인트를 제공해주셔서 감사합니다.😊
 
 ## 사실은...🫢
+
 - 이 프로젝트 코드의 기반은 도언님의 코드이며, 이후 수정/생성된 대부분의 코드는 claude 3.5 sonnet, chat-gpt-4o 에 의해 생성된 것임을 밝힙니다.
