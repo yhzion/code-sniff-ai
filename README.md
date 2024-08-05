@@ -28,6 +28,7 @@ code-sniff-ai
 - OpenAI chatgpt
 - Anthropic Claude
 - Google Gemini
+- groq
 
 ### 1. .env 파일 설정
 
