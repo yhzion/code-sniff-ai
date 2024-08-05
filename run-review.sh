@@ -51,7 +51,7 @@ run() {
     if [ "$service_provider" == "claude" ]; then
         headers+=("-H" "x-api-key: $API_KEY")
         headers+=("-H" "anthropic-version: $anthropic_version")
-    elif [ "$service_provider" == "chatgpt" ]; then
+    elif [ "$service_provider" == "chatgpt" ] || [ "$service_provider" == "groq" ]; then
         headers+=("-H" "Authorization: Bearer $API_KEY")
     elif [ "$service_provider" == "gemini" ]; then
         # Gemini doesn't need any additional headers
