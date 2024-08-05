@@ -1,6 +1,6 @@
 class HelloWorld {
   constructor() {
-    this.message = 'Hello, World!';
+    this.message = "Hello, World!";
   }
 
   sayHello() {
