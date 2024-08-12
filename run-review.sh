@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# General settings
+CURRENT_DIR=$(pwd)
+TARGET_PROJECT_PATH=${TARGET_PROJECT_PATH:="./"}
+
 # Load environment variables from .env
 if [ ! -f ./.env ]; then
     echo "Error: .env file does not exist."
@@ -60,14 +64,26 @@ run() {
 
     echo -n "Reviewing code changes using $model on $service_provider"
     (
+        # Move to target project path
+        printf "\n리뷰를 위해 목표 프로젝트로 이동합니다.\n" 
+        cd "$TARGET_PROJECT_PATH" || { printf "지정된 경로로 이동할 수 없습니다.: $TARGET_PROJECT_PATH"; exit 1;}
+        printf "\n현재 디렉토리는 $TARGET_PROJECT_PATH 입니다.\n"
+
         # Move to the root directory of the project
         cd "$(git rev-parse --show-toplevel)"
 
         # Find modified files with specific extensions
         files=$(git diff --cached --name-only --diff-filter=ACM | grep -E "$file_extensions")
 
+        # Exit process if files are not found
+        if [ -z "$files" ]; then
+          printf "리뷰할 대상이 존재하지 않습니다."
+          exit 1
+        fi
+
         for file in $files
         do
+            printf "$file 파일을 리뷰 중 입니다."
             # Get the full content of the file
             full_content=$(cat "$file")
             
@@ -143,6 +159,11 @@ run() {
                 exit 1
             fi
         done
+
+        # Move to current dir after review has done.
+        cd "$CURRENT_DIR" || { printf "현재 위치로 복귀할 수 없습니다.: $CURRENT_DIR"; exit 1;}
+        printf "\n현재 디렉토리는 $CURRENT_DIR 입니다.\n"
+        printf "\n리뷰가 종료되었습니다.\n"
 
     ) & spinner
 }
