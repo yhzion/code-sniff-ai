@@ -1,0 +1,58 @@
+name: 'code-sniff-ai'
+description: >
+  AI code review for pull requests and staged changes using
+  Claude, ChatGPT, Gemini, Groq, or Ollama.
+branding:
+  icon: 'search'
+  color: 'purple'
+
+inputs:
+  provider:
+    description: 'claude | chatgpt | gemini | groq | ollama'
+    required: false
+    default: 'claude'
+  model:
+    description: 'Model name (default depends on provider)'
+    required: false
+  endpoint:
+    description: 'API endpoint override'
+    required: false
+  api-key:
+    description: 'API key (pass via secrets, e.g. secrets.ANTHROPIC_API_KEY)'
+    required: true
+  response-path:
+    description: 'jq path to the review text in the API response'
+    required: false
+  max-tokens:
+    description: 'Max output tokens'
+    required: false
+    default: '4096'
+  extensions:
+    description: 'Comma-separated file extensions to review (e.g. ".ts,.tsx,.py")'
+    required: false
+  prompt:
+    description: 'Review prompt override'
+    required: false
+  diff:
+    description: 'Git diff range for PR review (e.g. "origin/main...HEAD"). Default: staged changes.'
+    required: false
+  target:
+    description: 'Path to the project to review (default: repository root)'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      env:
+        SERVICE_PROVIDER: ${{ inputs.provider }}
+        MODEL: ${{ inputs.model }}
+        ENDPOINT: ${{ inputs.endpoint }}
+        API_KEY: ${{ inputs.api-key }}
+        RESPONSE_PATH: ${{ inputs.response-path }}
+        MAX_TOKENS: ${{ inputs.max-tokens }}
+        FILE_EXTENSIONS: ${{ inputs.extensions }}
+        PROMPT: ${{ inputs.prompt }}
+        REVIEW_DIFF: ${{ inputs.diff }}
+        TARGET_PROJECT_PATH: ${{ inputs.target }}
+      run: node "${{ github.action_path }}/bin/cli.js"

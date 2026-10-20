@@ -4,13 +4,15 @@
 CURRENT_DIR=$(pwd)
 TARGET_PROJECT_PATH=${TARGET_PROJECT_PATH:="./"}
 
-# Load environment variables from .env
-if [ ! -f ./.env ]; then
-    echo "Error: .env file does not exist."
+# Load environment variables from .env (optional when configured via environment/CLI)
+if [ -f ./.env ]; then
+    source ./.env
+elif [ -z "$API_KEY" ]; then
+    echo "Error: no configuration found."
+    echo "Create a .env file (see .env.sample) or set API_KEY (and related variables),"
+    echo "or run: npx code-sniff-ai --provider claude --model <model> --api-key <key>"
     exit 1
 fi
-
-source ./.env
 
 # Check if jq is installed
 if ! command -v jq &> /dev/null; then
@@ -50,6 +52,7 @@ run() {
 
     max_tokens=${MAX_TOKENS:-4096}
     file_extensions=${FILE_EXTENSIONS:-".json$|.xml$|.ts$|.js$|.html$|.vue$|.sh$|.tsx$|.jsx$"}
+    review_diff=${REVIEW_DIFF:-}
     
     # 서비스 제공자에 따라 API 키 헤더 설정
     if [ "$service_provider" == "claude" ]; then
@@ -73,7 +76,12 @@ run() {
         cd "$(git rev-parse --show-toplevel)"
 
         # Find modified files with specific extensions
-        files=$(git diff --cached --name-only --diff-filter=ACM | grep -E "$file_extensions")
+        # REVIEW_DIFF (e.g. "origin/main...HEAD") enables CI/PR review; default: staged changes
+        if [ -n "$review_diff" ]; then
+            files=$(git diff $review_diff --name-only --diff-filter=ACM | grep -E "$file_extensions")
+        else
+            files=$(git diff --cached --name-only --diff-filter=ACM | grep -E "$file_extensions")
+        fi
 
         # Exit process if files are not found
         if [ -z "$files" ]; then
@@ -88,7 +96,11 @@ run() {
             full_content=$(cat "$file")
             
             # Get only the changed content
-            changed_content=$(git diff --cached "$file" | grep '^[+-]' | grep -v '^[-+][-+][-+]' | sed 's/^[+-]//')
+            if [ -n "$review_diff" ]; then
+                changed_content=$(git diff $review_diff -- "$file" | grep '^[+-]' | grep -v '^[-+][-+][-+]' | sed 's/^[+-]//')
+            else
+                changed_content=$(git diff --cached "$file" | grep '^[+-]' | grep -v '^[-+][-+][-+]' | sed 's/^[+-]//')
+            fi
             
             if [ -n "$changed_content" ]; then
                 # Create JSON payload to send to the API
@@ -167,12 +179,6 @@ run() {
 
     ) & spinner
 }
-
-# 서비스 제공자에 따른 .env 파일 존재 여부 확인
-if [ ! -f "./.env" ]; then
-    echo "Error: .env file does not exist."
-    exit 1
-fi
 
 # 실행
 run

@@ -2,7 +2,12 @@
 
 # code-sniff-ai
 
+[![npm version](https://img.shields.io/npm/v/code-sniff-ai.svg)](https://www.npmjs.com/package/code-sniff-ai)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 **code-sniff-ai**는 코드 변경 사항을 자동으로 리뷰해주는 쉘 스크립트입니다. 특정 파일 형식에 대해 git diff를 활용하여 변경된 내용을 추출하고, API를 통해 변경된 코드에 대한 리뷰를 제공합니다.
+
+npm CLI와 GitHub Action으로도 제공됩니다. 자세한 보안 정책은 [SECURITY.md](./SECURITY.md)를 참고하세요.
 
 ## 프로젝트 구조
 
@@ -20,7 +25,66 @@ code-sniff-ai
 └── run-review.sh
 ```
 
-## 설치 및 설정
+## 빠른 시작 (npm CLI)
+
+`.env` 파일 없이도 플래그나 환경 변수로 바로 실행할 수 있습니다.
+
+```bash
+# 설치
+npm install -g code-sniff-ai
+
+# Claude로 스테이징된 변경 사항 리뷰
+export ANTHROPIC_API_KEY=sk-ant-...
+git add -A
+code-sniff-ai
+
+# 한 번만 실행 (npx)
+npx code-sniff-ai --provider groq --model llama-3.1-8b-instant \
+  --diff "origin/main...HEAD" --extensions ".ts,.tsx"
+```
+
+| 플래그 | 설명 |
+| --- | --- |
+| `--provider` | `claude` \| `chatgpt` \| `gemini` \| `groq` \| `ollama` (기본: claude) |
+| `--model` | 모델명 (프로바이더별 기본값 있음) |
+| `--api-key` | API 키 (또는 `CODE_SNIFF_API_KEY`, `ANTHROPIC_API_KEY` 등 환경 변수) |
+| `--diff` | CI/PR용 diff 범위, 예: `origin/main...HEAD` (기본: staged) |
+| `--extensions` | 리뷰 대상 확장자, 예: `.ts,.tsx,.py` |
+| `--prompt` / `--prompt-file` | 리뷰 프롬프트 지정 |
+| `--target` | 리뷰할 프로젝트 경로 |
+| `--max-tokens` | 최대 출력 토큰 (기본 4096) |
+| `--env` | `.env` 경로 지정 (기본: 현재 디렉토리의 `./.env`) |
+
+필요 요소: `git`, `jq`, `curl`, `bash` (macOS/Linux, Windows는 WSL 또는 Git Bash).
+
+## GitHub Actions에서 사용
+
+PR에 자동 리뷰를 붙이려면 워크플로에 아래처럼 추가합니다.
+
+```yaml
+name: AI Code Review
+on:
+  pull_request:
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch origin main
+      - uses: yhzion/code-sniff-ai@v0.1
+        with:
+          provider: claude
+          model: claude-sonnet-4-5
+          api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          diff: origin/main...HEAD
+          extensions: .ts,.tsx,.py,.js,.go
+```
+
+## 설치 및 설정 (쉘 스크립트 직접 사용)
 
 ### 0. 지원되는 서비스
 
@@ -136,7 +200,7 @@ ollama pull gemma2
 
 ## 연구가 필요한 내용
 
-### 1. Git Workflow 자동화
+### 1. Git Workflow 자동화 ✅ (2026-10: npm CLI + GitHub Action으로 제공, 위 섹션 참고)
 
 `code-sniff-ai`를 Git workflow에 통합하여 코드 리뷰 자동화를 더욱 효율적으로 만들 수 있는 방법을 연구 중입니다. 예를 들어, 특정 브랜치에 푸시할 때 자동으로 코드 리뷰가 트리거되도록 하거나, PR 생성 시 자동 리뷰를 실행하는 방법을 모색하고 있습니다. 이러한 통합은 CI/CD 파이프라인에 포함하여 개발 프로세스를 개선할 수 있습니다.
 

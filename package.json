@@ -1,0 +1,47 @@
+{
+  "name": "code-sniff-ai",
+  "version": "0.1.0",
+  "description": "AI-powered code review CLI for staged git diffs. Works with Claude, ChatGPT, Gemini, Groq, and Ollama.",
+  "license": "MIT",
+  "bin": {
+    "code-sniff-ai": "bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "run-review.sh",
+    ".env.sample",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "keywords": [
+    "ai",
+    "code-review",
+    "git",
+    "llm",
+    "claude",
+    "openai",
+    "chatgpt",
+    "gemini",
+    "groq",
+    "ollama",
+    "security",
+    "github-action"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yhzion/code-sniff-ai.git"
+  },
+  "homepage": "https://github.com/yhzion/code-sniff-ai#readme",
+  "bugs": {
+    "url": "https://github.com/yhzion/code-sniff-ai/issues"
+  },
+  "author": {
+    "name": "Youngho Jeon",
+    "email": "gplusit@gmail.com",
+    "url": "https://github.com/yhzion"
+  }
+}
