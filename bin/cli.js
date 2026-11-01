@@ -233,6 +233,10 @@ function resolveConfig(flags) {
     FILE_EXTENSIONS: normalizeExtensions(get('extensions')),
     TARGET_PROJECT_PATH: get('target') || '',
     REVIEW_DIFF: flags.diff ?? get('diff') ?? '',
+    // The reviewed repository must never influence the review pipeline itself:
+    // the engine must not auto-source ./.env from the working directory
+    // (CVE-class: endpoint hijack / code exfiltration via a planted .env).
+    CS_NO_AUTOENV: '1',
   };
   if (prompt) cfg.PROMPT = prompt;
   return cfg;

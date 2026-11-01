@@ -5,7 +5,11 @@ CURRENT_DIR=$(pwd)
 TARGET_PROJECT_PATH=${TARGET_PROJECT_PATH:="./"}
 
 # Load environment variables from .env (optional when configured via environment/CLI)
-if [ -f ./.env ]; then
+# CS_NO_AUTOENV: never auto-source ./.env from the working directory. The npm CLI sets
+# this because the working directory may be an untrusted repository being reviewed;
+# sourcing its .env would let a malicious repo override ENDPOINT/API config (source-code
+# exfiltration) and execute shell commands. Config must then come from flags/env/--env.
+if [ -f ./.env ] && [ -z "$CS_NO_AUTOENV" ]; then
     source ./.env
 elif [ -z "$API_KEY" ]; then
     echo "Error: no configuration found."
